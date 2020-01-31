@@ -1,0 +1,136 @@
+<html>
+  <head>
+    <title>ISS Locator</title>
+    <link rel="icon" type="image/ico" href="earthIcon.png">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+    <style>
+      body {
+        margin:0;
+      }
+      #issMap {
+        height:100vh;
+        width:100vw;
+      }
+      .infoCont {
+        margin:10px;
+        padding:15px;
+        background:#9c9c9cad;
+        border-radius:10px;
+        font-size:1.2rem;
+        font-weight:bold;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div id="issMap"></div>
+    
+    <script>
+      let latitude,longitude,altitude,velocity;
+      let firstCall = true;
+      let follow = false;
+
+      const apiURL = "https://api.wheretheiss.at/v1/satellites/25544";
+      
+      const issIcon = L.icon({
+        iconUrl:'issIcon.svg',
+        iconSize:[100,100]
+      });
+      
+      const marker = L.marker([0,0],{icon:issIcon});
+      const mymap = L.map('issMap',{zoomControl:false}).setView([0,0],1);
+      const info = L.control({position:'topleft'});
+      
+      info.onAdd = event => {
+        var div = L.DomUtil.create('div','infoCont');
+        div.innerHTML = `
+          <h1>Where is the ISS?</h1>
+
+          <p>Latitude: ${latitude.toFixed(2)}°</p>
+          <p>Longitude: ${longitude.toFixed(2)}°</p>
+          <p>Altitude: ${altitude.toFixed(2)} km</p>
+          <p>Velocity: ${velocity.toFixed(2)} km/h</p>
+        `;
+        return div;
+      };
+      
+      const earthNight = L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.{format}', {
+        attribution: 'Imagery provided by services from the Global Imagery Browse Services (GIBS), operated by the NASA/GSFC/Earth Science Data and Information System (<a href="https://earthdata.nasa.gov">ESDIS</a>) with funding provided by NASA/HQ.',
+        bounds: [[-85.0511287776, -179.999999975], [85.0511287776, 179.999999975]],
+        minZoom: 1,
+        maxZoom: 8,
+        format: 'jpg',
+        time: '',
+        tilematrixset: 'GoogleMapsCompatible_Level'
+      });
+      const earthDay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      });
+      const earthTopo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+      });
+      const overlay = L.tileLayer('https://maps.heigit.org/openmapsurfer/tiles/hybrid/webmercator/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> | Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      });
+
+      var mapSelection = [earthDay,earthNight,earthTopo];
+      var mapIndex = 0;
+
+      mapSelection[mapIndex].addTo(mymap);
+      marker.addTo(mymap);
+      overlay.addTo(mymap);
+      
+      getISS();
+      setInterval(getISS,1000);
+      
+      document.onkeypress = event => {
+        switch (event.key) {
+          case 'f': follow = !follow; break;
+          case 'c': centerISS(); break;
+          case 'q': mymap.zoomOut(1); break;
+          case 'w': mymap.zoomIn(1); break;
+          case 's': switchMap(); break;
+        }
+      }
+      
+      async function getISS() {
+        const res = await fetch(apiURL);
+        const data = await res.json();
+        ({latitude,longitude,altitude,velocity} = data);
+        
+        if (firstCall == true) {
+          mymap.setView([latitude,longitude],3);
+          firstCall = false;
+        }
+        
+        if (follow == true) {
+          mymap.setView([latitude,longitude]);
+        }
+        
+        info.addTo(mymap);
+        marker.setLatLng([latitude,longitude]);
+      }
+
+      function switchMap() {
+        mapSelection[mapIndex].remove();
+        if (mapIndex == mapSelection.length-1) {
+          mapIndex = 0;
+        }
+        else {
+          mapIndex++;
+        }
+        mapSelection[mapIndex].addTo(mymap);
+      }
+
+      var centerISS = async ()=> mymap.setView([latitude,longitude],5);
+    </script>
+  </body>
+</html>
