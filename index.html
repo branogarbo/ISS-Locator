@@ -32,9 +32,10 @@
     <div id="issMap"></div>
     
     <script>
-      let latitude,longitude,altitude,velocity;
-      let firstCall,isOverlay = true;
-      let follow = false;
+      var latitude,longitude,altitude,velocity;
+      var isOverlay = true;
+      var follow = true;
+      var firstCall = true;
 
       const apiURL = "https://api.wheretheiss.at/v1/satellites/25544";
       
@@ -56,6 +57,14 @@
           <p>Longitude: ${longitude.toFixed(2)}°</p>
           <p>Altitude: ${altitude.toFixed(2)} km</p>
           <p>Velocity: ${velocity.toFixed(2)} km/h</p>
+
+          <h2>Key Functions:</h2>
+
+          <p>q,w keys: zoom</p>
+          <p>s key: switch map</p>
+          <p>c key: center view</p>
+          <p>o key: toggle overlay</p>
+          <p>f key: follow/unfollow ISS</p>
         `;
         return div;
       };
@@ -107,13 +116,13 @@
         const data = await res.json();
         ({latitude,longitude,altitude,velocity} = data);
         
-        if (firstCall) {
-          mymap.setView([latitude,longitude],3);
-          firstCall = false;
-        }
-        
         if (follow) {
           mymap.setView([latitude,longitude]);
+        }
+
+        if (firstCall) {
+          centerISS();
+          firstCall = false;
         }
         
         info.addTo(mymap);
@@ -131,9 +140,9 @@
         }
         mapSelection[mapIndex].addTo(mymap);
         if (isOverlay) {overlay.addTo(mymap)};
-      }
+      };
 
-      var centerISS = async ()=> mymap.setView([latitude,longitude],5);
+      var centerISS = ()=> mymap.setView([latitude,longitude],5);
 
       function toggleOverlay() {
         if (isOverlay) {
