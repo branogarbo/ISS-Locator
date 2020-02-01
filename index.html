@@ -33,7 +33,7 @@
     
     <script>
       let latitude,longitude,altitude,velocity;
-      let firstCall,isOverlay= true;
+      let firstCall,isOverlay = true;
       let follow = false;
 
       const apiURL = "https://api.wheretheiss.at/v1/satellites/25544";
@@ -107,12 +107,12 @@
         const data = await res.json();
         ({latitude,longitude,altitude,velocity} = data);
         
-        if (firstCall == true) {
+        if (firstCall) {
           mymap.setView([latitude,longitude],3);
           firstCall = false;
         }
         
-        if (follow == true) {
+        if (follow) {
           mymap.setView([latitude,longitude]);
         }
         
