@@ -33,7 +33,7 @@
     
     <script>
       let latitude,longitude,altitude,velocity;
-      let firstCall = true;
+      let firstCall,isOverlay= true;
       let follow = false;
 
       const apiURL = "https://api.wheretheiss.at/v1/satellites/25544";
@@ -98,6 +98,7 @@
           case 'q': mymap.zoomOut(1); break;
           case 'w': mymap.zoomIn(1); break;
           case 's': switchMap(); break;
+          case 'o': toggleOverlay(); break;
         }
       }
       
@@ -121,6 +122,7 @@
 
       function switchMap() {
         mapSelection[mapIndex].remove();
+        overlay.remove();
         if (mapIndex == mapSelection.length-1) {
           mapIndex = 0;
         }
@@ -128,9 +130,20 @@
           mapIndex++;
         }
         mapSelection[mapIndex].addTo(mymap);
+        if (isOverlay) {overlay.addTo(mymap)};
       }
 
       var centerISS = async ()=> mymap.setView([latitude,longitude],5);
+
+      function toggleOverlay() {
+        if (isOverlay) {
+          overlay.remove();
+        }
+        else {
+          overlay.addTo(mymap);
+        }
+        isOverlay = !isOverlay;
+      }
     </script>
   </body>
 </html>
