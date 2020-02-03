@@ -2,6 +2,7 @@
   <head>
     <title>ISS Locator</title>
     <link rel="icon" type="image/ico" href="earthIcon.png">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
     integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
     crossorigin=""/>
@@ -11,42 +12,84 @@
     <style>
       body {
         margin:0;
+        display:flex;
       }
       #issMap {
         height:100vh;
-        width:100vw;
+        flex-grow:1;
       }
-      .infoCont {
-        margin:10px;
-        padding:15px;
-        background:hsla(0, 0%, 100%, 0.549);
-        border-radius:10px;
+      #infoCont {
+        font-family:'Poppins',sans-serif;
+        padding:25px;
+        background:#ffffff;
+        color:#3d4853;
         font-size:1.2rem;
-        font-weight:bold;
       }
       #buttonCont {
         display:flex;
         justify-content:space-between;
       }
       #buttonCont div {
-        padding:15px;
+        padding:10px 20px;
         text-align:center;
         border-radius:5px;
-        cursor:default;
-        background:#ffffff2d;
+        cursor:pointer;
+        border:3px solid #dde4ee;
         transition:background 0.2s;
       }
       #buttonCont div:hover {
-        background:#ffffff8c;
+        background:#dde4ee;
+      }
+      #earthIcon {
+        width:60px;
+        height:60px;
+      }
+      #header {
+        display:flex;
+        align-items:center;
+      }
+      #header > h1 {
+        margin-left:15px;
+        color:#61a3ef;
       }
     </style>
   </head>
   <body>
+
+    <div id="infoCont">
+      <div id="header">
+        <img id="earthIcon" src="earthIcon.png">
+        <h1>Where is the ISS?</h1>
+      </div>
+
+      <p>Latitude: <span class="dataHTML"></span>°</p>
+      <p>Longitude: <span class="dataHTML"></span>°</p>
+      <p>Altitude: <span class="dataHTML"></span> km</p>
+      <p>Velocity: <span class="dataHTML"></span> km/h</p>
+
+      <hr>
+
+      <h3>Key Functions:</h3>
+
+      <p>q,w keys: zoom</p>
+      <p>s key: switch map</p>
+      <p>c key: center view</p>
+      <p>o key: toggle overlay</p>
+      <p>f key: follow/unfollow ISS</p>
+
+      <div id="buttonCont">
+        <div onclick="follow = !follow">Toggle<br>follow</div>
+        <div onclick="switchMap()">Switch<br>map</div>
+        <div onclick="toggleOverlay()">Toggle<br>overlay</div>
+      </div>
+    </div>
     
     <div id="issMap"></div>
     
     <script>
-      let latitude,longitude,altitude,velocity;
+      let featData = ["latitude","longitude","altitude","velocity"]
+      featData.forEach(data => eval(`let ${data};`));
+
       let isOverlay = true;
       let follow = true;
       let firstCall = true;
@@ -60,34 +103,6 @@
       
       let marker = L.marker([0,0],{icon:issIcon});
       let mymap = L.map('issMap',{zoomControl:false}).setView([0,0],1);
-      let info = L.control({position:'topleft'});
-      
-      info.onAdd = event => {
-        let div = L.DomUtil.create('div','infoCont');
-        div.innerHTML = `
-          <h1>Where is the ISS?</h1>
-
-          <p>Latitude: ${latitude.toFixed(2)}°</p>
-          <p>Longitude: ${longitude.toFixed(2)}°</p>
-          <p>Altitude: ${altitude.toFixed(2)} km</p>
-          <p>Velocity: ${velocity.toFixed(2)} km/h</p>
-
-          <h2>Key Functions:</h2>
-
-          <p>q,w keys: zoom</p>
-          <p>s key: switch map</p>
-          <p>c key: center view</p>
-          <p>o key: toggle overlay</p>
-          <p>f key: follow/unfollow ISS</p>
-
-          <div id="buttonCont">
-            <div onclick="follow = !follow">Toggle<br>follow</div>
-            <div onclick="switchMap()">Switch<br>map</div>
-            <div onclick="toggleOverlay()">Toggle<br>overlay</div>
-          </div>
-        `;
-        return div;
-      };
       
       let earthNight = L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.{format}', {
         attribution: 'Imagery provided by services from the Global Imagery Browse Services (GIBS), operated by the NASA/GSFC/Earth Science Data and Information System (<a href="https://earthdata.nasa.gov">ESDIS</a>) with funding provided by NASA/HQ.',
@@ -139,14 +154,17 @@
         if (follow) {
           mymap.setView([latitude,longitude]);
         }
-
+        
         if (firstCall) {
           centerISS();
           firstCall = false;
         }
         
-        info.addTo(mymap);
         marker.setLatLng([latitude,longitude]);
+
+        for (i=0; i<featData.length; i++) {
+          document.getElementsByClassName('dataHTML')[i].innerHTML = eval(featData[i]).toFixed(2);
+        }
       }
 
       function switchMap() {
