@@ -20,37 +20,37 @@
       }
       #infoCont {
         font-family:'Poppins',sans-serif;
-        padding:25px;
+        padding:3vh;
         background:#ffffff;
         color:#3d4853;
-        font-size:1.2rem;
-      }
-      #buttonCont {
-        display:flex;
-        justify-content:space-between;
+        font-size:2.2vh;
       }
       #buttonCont div {
-        padding:8px 10px;
+        padding:8px 0;
         text-align:center;
         border-radius:5px;
+        margin-bottom:5px;
         cursor:pointer;
-        border:3px solid #dde4ee;
-        transition:background 0.2s;
+        background:#dde4ee;
+        transition:transform 0.2s;
       }
       #buttonCont div:hover {
-        background:#dde4ee;
+        transform:scale(1.03);
       }
       #earthIcon {
-        width:95px;
-        height:95px;
+        width:8vh;
+        height:8vh;
       }
       #header {
         display:flex;
         align-items:center;
       }
-      #header > h1 {
-        margin-left:25px;
+      #header > h2 {
+        margin:0px 20px;
         color:#61a3ef;
+      }
+      #infoCont hr {
+        border:0.25px solid;
       }
     </style>
   </head>
@@ -59,7 +59,7 @@
     <div id="infoCont">
       <div id="header">
         <img id="earthIcon" src="earthIcon.png">
-        <h1>Where is<br>the ISS?</h1>
+        <h2>Where is<br>the ISS?</h2>
       </div>
 
       <p>Latitude: <span class="dataHTML"></span>°</p>
@@ -78,9 +78,9 @@
       <p>f key: follow/unfollow ISS</p>
 
       <div id="buttonCont">
-        <div onclick="follow = !follow">Toggle<br>follow</div>
-        <div onclick="switchMap()">Switch<br>map</div>
-        <div onclick="toggleOverlay()">Toggle<br>overlay</div>
+        <div onclick="follow = !follow">Toggle follow</div>
+        <div onclick="switchMap()">Switch map</div>
+        <div onclick="toggleOverlay()">Toggle overlay</div>
       </div>
     </div>
     
