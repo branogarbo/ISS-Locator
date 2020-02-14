@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <title>ISS Locator</title>
+    <link rel="icon" type="image/ico" href="/images/earthIcon.png">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+  </head>
+  <body>
+
+    <div id="infoCont">
+      <div id="header">
+        <img id="earthIcon" src="/images/earthIcon.png">
+        <h2>Where is<br>the ISS?</h2>
+      </div>
+
+      <p>Latitude: <span class="dataHTML"></span>°</p>
+      <p>Longitude: <span class="dataHTML"></span>°</p>
+      <p>Altitude: <span class="dataHTML"></span> km</p>
+      <p>Velocity: <span class="dataHTML"></span> km/h</p>
+
+      <hr>
+
+      <h3>Key Functions:</h3>
+
+      <p>q,w keys: zoom</p>
+      <p>s key: switch map</p>
+      <p>c key: center view</p>
+      <p>o key: toggle overlay</p>
+      <p>f key: follow/unfollow ISS</p>
+
+      <div id="buttonCont">
+        <div onclick="follow = !follow">Toggle follow</div>
+        <div onclick="switchMap()">Switch map</div>
+        <div onclick="toggleOverlay()">Toggle overlay</div>
+      </div>
+    </div>
+    
+    <div id="issMap"></div>
+    
+    <script src="/javascripts/index.js"></script>
+  </body>
+</html>
